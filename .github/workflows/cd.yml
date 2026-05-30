@@ -1,0 +1,42 @@
+name: CD
+
+on:
+  push:
+    branches: [main]    # PR merge되면 트리거
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests (배포 전 최종 확인)
+        run: pytest tests/ -v
+
+      # 실제 배포 단계 — 지금은 시뮬레이션
+      # 실무에서는 아래 부분을 SSH 배포, Docker push, AWS CLI 등으로 교체
+      - name: Deploy (simulation)
+        run: |
+          echo "배포 시작: ${{ github.sha }}"
+          echo "브랜치: ${{ github.ref_name }}"
+          echo "커밋 메시지: ${{ github.event.head_commit.message }}"
+          echo "배포 완료 (시뮬레이션)"
+
+      # Secrets 사용 예시 — GitHub 저장소 Settings > Secrets에서 설정
+      # - name: Deploy to server
+      #   env:
+      #     DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      #     SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      #   run: |
+      #     echo "$DEPLOY_KEY" > /tmp/deploy_key && chmod 600 /tmp/deploy_key
+      #     ssh -i /tmp/deploy_key user@$SERVER_HOST "cd /app && git pull && restart"
