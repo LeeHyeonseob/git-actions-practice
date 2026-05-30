@@ -5,26 +5,15 @@ on:
     branches: [main]    # PR merge되면 트리거
 
 jobs:
+  test:
+    uses: ./.github/workflows/test.yml   # 테스트 워크플로 호출
   deploy:
     name: Deploy
+    needs: test   # 테스트가 성공해야 배포 시작
     runs-on: ubuntu-latest
-
+    # 실제 배포 단계 — 지금은 시뮬레이션
+    # 실무에서는 아래 부분을 SSH 배포, Docker push, AWS CLI 등으로 교체
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run tests (배포 전 최종 확인)
-        run: pytest tests/ -v
-
-      # 실제 배포 단계 — 지금은 시뮬레이션
-      # 실무에서는 아래 부분을 SSH 배포, Docker push, AWS CLI 등으로 교체
       - name: Deploy (simulation)
         run: |
           echo "배포 시작: ${{ github.sha }}"
